@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "discord.js": "^12.5.3",
+    "i18next": "^20.2.2",
+    "i18next-node-fs-backend": "^2.1.3",
+    "moment": "^2.29.1",
+    "moment-duration-format": "^2.3.2",
+    "mongoose": "^5.12.8"
+  },
+  "name": "template-multilang",
+  "version": "1.0.0",
+  "main": "shard.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
