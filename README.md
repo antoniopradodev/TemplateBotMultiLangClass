@@ -1,2 +1,2 @@
 # TemplateBotMultiLangClass
- 🤖 | A multi-language bot made in class
+ 🤖 | A multilingual bot made in class and using the Discord.js module.

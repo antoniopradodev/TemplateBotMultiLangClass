@@ -1,0 +1,7 @@
+{
+    "token": "ODMyMDUwMDIxNTUzNzk5MTg5.YHeI9w.DrPlKBAEJYmNPNphn13QduO_X3s",
+    "mongourl": "mongodb+srv://bot:K642U4lnrx4fh75H@cluster0.jlnrj.mongodb.net/Class",
+    "prefix": "!",
+    "owners": ["478212471723655168", "731328069306155061"],
+    "shards": 1
+}
