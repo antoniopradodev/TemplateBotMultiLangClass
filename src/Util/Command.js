@@ -6,7 +6,7 @@ module.exports = class Command {
 			name: options.name || null,
 			category: options.category || "Não categorizado",
 			aliases: options.aliases || [],
-			cooldown: options.cooldown || 5000,
+			cooldown: options.cooldown || 5,
 			UserPermission: options.UserPermission || null,
 			ClientPermission: options.ClientPermission || null,
 			OnlyDevs: options.OnlyDevs || false

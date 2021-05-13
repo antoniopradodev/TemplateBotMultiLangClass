@@ -1,5 +1,5 @@
 const {readdirSync} = require("fs");
-const {use} = require("i18next");
+const i18next = require("i18next");
 const translationBackend = require("i18next-node-fs-backend");
 
 module.exports = class LocaleStructure {
@@ -11,9 +11,9 @@ module.exports = class LocaleStructure {
 
     async initLocales(dir) {
         try {
-            use(translationBackend).init({
+            i18next.use(translationBackend).init({
                 ns:this.ns,
-                preload: await readdirSync(dir),
+                preload: await readdirSync(`${dir}/`),
                 fallbackLng: "pt-BR",
                 backend: {
                     loadPath: `${dir}/{{lng}}/{{ns}}.json`
@@ -24,13 +24,13 @@ module.exports = class LocaleStructure {
                 returnEmpyString: false
             });
         } catch(err) {
+            console.err(err);
         }
     }
 
     load(dir) {
         try {
-            this.initLocales(dir);
-            console.log("[LOCALES] Locales loaded!");
+            this.initLocales(dir).then(() => console.log("[LOCALES] Locales loaded!"))
             return true;
         } catch (e) {
             console.err(err);

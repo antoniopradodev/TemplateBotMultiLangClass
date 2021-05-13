@@ -4,7 +4,9 @@ module.exports = class PingCommand extends Command {
 	constructor(client) {
 		super(client, {
 			name: "ping",
-			aliases: []
+			aliases: [],
+			cooldown: 10,
+			OnlyDevs: false
 		})
 	}
 	run({ message, args, server, user }, t) {

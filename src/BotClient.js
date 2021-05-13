@@ -8,6 +8,7 @@ module.exports = class BotClient extends Client {
 
         this.commands = new Collection()
 		this.aliases = new Collection()
+        this.cooldowns = new Collection()
 		this.events = new EventManager(this)
         this.database = MongooseConnection
         this.config = require(`../config`)

@@ -1,1 +1,10 @@
-{}
+{
+    "message": {
+        "mention_bot": "Olá <@{{user}}>, meu prefixo neste servidor é `{{prefix}}`, se precisar de ajuda, use `{{prefix}}ajuda`.",
+        "cooldown": {
+            "message": "calma aí, você precisa esperar `{{time}}` antes de executar outro comando.",
+            "secounds": "segundos",
+            "milliseconds": "alguns milisegundos"
+        }
+    }
+}

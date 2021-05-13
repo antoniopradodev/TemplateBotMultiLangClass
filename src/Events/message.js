@@ -1,6 +1,7 @@
 const {BotEmbed} = require('../Util/');
 const {utc, duration} = require("moment");
-const {getFixedT} = require("i18next")
+const i18next = require("i18next");
+const {Collection} = require("discord.js");
 require("moment-duration-format");
 
 module.exports = class MessageEvent {
@@ -17,29 +18,44 @@ module.exports = class MessageEvent {
         if(!server) {this.client.database.Guilds({_id:message.guild.id}).save()}
         if(!user) {this.client.database.Users({_id:message.author.id}).save()}
 
-        let t = getFixedT((server && server.lang) || "pt-BR");
+        let t
+		const setFixedT = function (translate) {
+			t = translate
+		}
+
+		const language = (server && server.lang) || "pt-BR"
+		setFixedT(i18next.getFixedT(language))
 
         if(message.content.replace(/!/g, "") === message.guild.me.toString().replace(/!/g, "")) {
-            message.channel.send(`${t("events:mention", {user:message.author,prefix:server.prefix})}`)
+            message.channel.send(`${t("events:message.mention_bot", {user:message.author,prefix:server.prefix})}`)
         }
 
         if(!message.content.startsWith(server.prefix)) return;
         const args = message.content.slice(server.prefix.length).trim().split(/ +/g);
-        const command = this.client.commands.get(args.shift().toLowerCase()) || this.client.commands.get(this.client.aliases.get(args.shift().toLowerCase()))
+        const cmd = args.shift().toLowerCase();
+        const command = this.client.commands.get(cmd) || this.client.commands.get(this.client.aliases.get(cmd))
         if(!command) return;
         if(command.config.OnlyDevs) {
             if(!this.client.config.owners.includes(message.author.id)) return message.channel.send(t("permissions:ONLY_DEVS"));
         }
 
-        const cooldown = new Map();
-        if(cooldown.has(message.author.id)) {
-            return message.channel.send(t("events:cooldown.message", {time:(cooldown.get(message.author.id) - Date.now() > 1000) ? utc(cooldown.get(message.author.id) - Date.now()).format(`ss [${t("events:cooldown.secounds")}]`) : duration(cooldown.get(message.author.id) - Date.now()).format(`[${t("events:cooldown.milliseconds")}]`)}))
+        if(!this.client.cooldowns.has(command.config.name) && !this.client.config.owners.includes(message.author.id)) {
+            this.client.cooldowns.set(command.config.name, new Collection());
         }
 
-        if(!this.client.config.owners.includes(message.author.id)) {
-            cooldown.set(message.author.id, Date.now() + command.cooldown);
-            setTimeout(() => {cooldown.delete(message.author.id)}, command.cooldown)
+        const timestamps = this.client.cooldowns.get(command.config.name);
+        const cooldownAmount = (command.config.cooldown) * 1000;
+
+        if (timestamps.has(message.author.id)) {
+            const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+
+            if (Date.now() < expirationTime) {
+                return message.channel.send(`${t("events:message.cooldown.message", {time:(expirationTime - Date.now() > 1000) ? utc(expirationTime - Date.now()).format(`ss [${t("events:message.cooldown.secounds")}]`) : duration(expirationTime - Date.now()).format(`[${t("events:message.cooldown.milliseconds")}]`)})}`)
+            }
         }
+
+        timestamps.set(message.author.id, Date.now());
+        setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 
         if(command.config.UserPermission !== null) {
             if(!message.member.hasPermission(command.config.UserPermission)) {
@@ -57,9 +73,10 @@ module.exports = class MessageEvent {
             command.setT(t);
             
             message.channel.startTyping(1)
-            command.run({message, args, server, user}, t)
+            await command.run({message, args, server, user}, t);
+            message.channel.stopTyping();
         } catch (err) {
-            message.channel.stopTyping(true);
+            message.channel.stopTyping();
 
             message.channel.send(
                 new BotEmbed(message.author)
